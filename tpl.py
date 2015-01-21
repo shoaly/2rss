@@ -2,7 +2,7 @@
 <rss version="2.0">
   <channel>
     <title>{{rss_title}}</title>
-    <link>http://baidu.com</link>
+    <link>{{source_url}}</link>
     <description>{{rss_title}}</description>
     <lastBuildDate>{{lastBuildDate}}</lastBuildDate>
     {{#items}}

@@ -31,6 +31,8 @@ class RSS:
         with open(self.path+"/"+self.tpl,"r") as file:
             rss_tpl = file.read()
             renderer = pystache.Renderer(file_encoding="utf-8",string_encoding="utf-8")
+            data['rss_title'] = self.rss_title
+            data['source_url'] = self.url
             rss = pystache.render(rss_tpl, data)
             return rss
 
@@ -84,7 +86,7 @@ class RSS:
         
 
 
-rss = RSS(encode_code="gbk",url="http://www.tcsisu.com/",rss_title="南方翻译Rss",output_file="tcsisu.xml",tpl="tpl.py")
+rss = RSS(encode_code="gbk",url="http://www.tcsisu.com/",rss_title=u"南方翻译Rss",output_file="tcsisu.xml",tpl="tpl.py")
 items = rss.filter_web_page();
 # print items
 rss_content = rss.generate_rss({"items":items,"lastBuildDate":datetime.today()})

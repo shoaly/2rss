@@ -32,6 +32,7 @@ class RSS:
             rss_tpl = file.read()
             renderer = pystache.Renderer(file_encoding="utf-8",string_encoding="utf-8")
             data['rss_title'] = self.rss_title
+            data['source_url'] = self.url
             rss = pystache.render(rss_tpl, data)
             return rss
 
@@ -70,7 +71,7 @@ class RSS:
         jQuery = pq(page)
 
         source_item = jQuery(".art_list .title a")
-        print source_item
+        # print source_item
         items = []
         for key,row in enumerate(source_item):
             title = jQuery(row).html()
