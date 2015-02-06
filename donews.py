@@ -13,7 +13,7 @@ from lxml import etree
 
 
  
-# print pystache.render('Hi {{person}}!', {'person': 'Mom'})
+## print pystache.render('Hi {{person}}!', {'person': 'Mom'})
 
 class RSS:
 

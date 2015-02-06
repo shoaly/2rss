@@ -13,17 +13,19 @@ from lxml import etree
 
 
  
-# ? print pystache.render('Hi {{person}}!', {'person': 'Mom'})
+# print pystache.render('Hi {{person}}!', {'person': 'Mom'})
 
 class RSS:
 
-    def __init__(self,url,output_file,tpl,encode_code="utf-8",rss_title="unnamed rss"):
+    def __init__(self,url,output_file,tpl,encode_code="utf-8",rss_title="unnamed rss",method="get",params={}):
         self.path = os.path.dirname(os.path.abspath(__file__))
         self.encode_code = encode_code
         self.url = url
         self.rss_title = rss_title
         self.output_file = output_file
         self.tpl = tpl
+        self.params = params
+        self.method = method
 
         # print self.path
 
@@ -44,54 +46,72 @@ class RSS:
      
     #返回 unicode         
     def fetch_web_page(self):
-        
-        print "fetch " + self.url
-        response = requests.get(self.url)
-        content = response.content
-        return content.decode(self.encode_code)
+        print self.method + ": " + self.url
+        if self.method == "get":
+            response = requests.get(self.url)
+            content = response.content
+            return content.decode(self.encode_code)
+        else :
+            response = requests.post(self.url,self.params)
+            content = response.content
+            return content.decode(self.encode_code)
 
-    # 获取 item的全文内容, unicode
+    # 获取 item的全文内容, unicode 编码
     def load_item_full_content(self,link):
         response = requests.get(link)
         response = response.content
         response = response.decode(self.encode_code)
         jQuery = pq(response)
-        content = jQuery('table[width="680"]')
+        content = jQuery('#content')
+
         # print response.decode("gbk").encode("utf-8")
-        content = jQuery(content[1]).html()
+        try :
+            content = jQuery(content[0]).html()
+            # 替换 lazy load的那些图片
+            content = content.replace("data-original","src")
+
+        except :
+            print link 
+            content = u"广告内容"
         
         # 替换掉乱码 <?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /?>
-        content = re.sub(re.compile("<\?xml.*?/\?>"),'',content)
+        # content = re.sub(re.compile("<\?xml.*?/\?>"),'',content)
 
         return content
-        # return content.decode(self.encode_code);
 
     def filter_web_page(self):
         page = self.fetch_web_page()
         
         jQuery = pq(page)
-
-        rss_row1 = jQuery("table[background='images/index_25.jpg'] a")
+        source_item = jQuery("#infinite_scroll>a")
         items = []
-        for key,row in enumerate(rss_row1):
-            title = jQuery(row).html()
-            link =  "http://www.tcsisu.com"+jQuery(row).attr("href")
-            description = self.load_item_full_content(link);
+        for key,row in enumerate(source_item):
+            title = jQuery(row).find(".title").text()
+
+            href = jQuery(row).attr("href")
+            if href[0:4] == "http" :
+                print "ad pass"
+                continue
+
+            link = "http://app.myzaker.com/news/" + href
+            description = ""
+            description = self.load_item_full_content(link)
+            # print description.encode("utf-8")
+            
             items.append({"title":title,"link":link,"description":description})
             print "done: " + link
-            # break
 
+            # break
         
         return items
         
 
 
-rss = RSS(encode_code="gbk",url="http://www.tcsisu.com/",rss_title=u"南方翻译Rss",output_file="tcsisu.xml",tpl="tpl.py")
+rss = RSS(encode_code="utf-8",url="http://app.myzaker.com/news/app.php?app_id=13&f=",rss_title=u"Zaker - 传递价值资讯",output_file="zaker.xml",tpl="tpl.py",method="get")
 items = rss.filter_web_page();
 # print items
 rss_content = rss.generate_rss({"items":items,"lastBuildDate":datetime.today()})
 rss.write_to_file(rss_content)
-
 
 
 
