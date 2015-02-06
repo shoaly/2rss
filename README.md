@@ -15,6 +15,10 @@ python写的比较小白, 大神笑后如能指点一二, 感激不尽. 也欢�
 - Donews 业内人说板块 (个人感觉还是比较有深度的) [donews.py]
 - 京东众筹的智能硬件板块[jdzc.py]
 - 南方翻译学院首页新闻 (纯个人关注的点, 可无视)[tcsisu.py]
+- donew 首页 [donews2.py]
+- zaker 首页 [zaker.py]
+- 豆瓣话题精选 [douban.py]
+- 豆瓣北京正在上映电影 [douban_movie.py]
 
 
 # 没琢磨明白的
